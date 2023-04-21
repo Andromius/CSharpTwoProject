@@ -9,15 +9,14 @@ namespace BusinessLayer
 	[DbEntity]
 	public class Reservation : DomainObject
 	{
-		[DbInner]
+		[DbForeignKey]
+		[DbAttr("user")]
 		public User Reservee { get; set; }
-		//[DbIgnore]
+		
 		[DbAttr("date_time_reservation")]
 		public DateTime ReservationTime { get; set; }
-		//[DbAttr("date_time_reservation")]
-		//[DbIgnore]
-		//public string DBReservationTime => ReservationTime.ToString();
-		[DbInner]
+
+		[DbForeignKey]
 		[DbAttr("service")]
 		public Service Service { get; set; }
 
@@ -36,7 +35,7 @@ namespace BusinessLayer
 		}
 		public override string ToString()
 		{
-			return $"{Id} {Reservee.Name} {Reservee.Surname} {ReservationTime.ToString()} {Service.Id}";
+			return $"{Id} {Reservee.Name} {Reservee.Surname} {ReservationTime} {Service.Id}";
 		}
 
 	}
