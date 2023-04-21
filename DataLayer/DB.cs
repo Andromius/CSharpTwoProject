@@ -92,7 +92,7 @@ namespace DataLayer
 			else if (type == typeof(int)) { return "INT"; }
 			else if (type == typeof(DateTime)) { return "DATETIME"; }
 			else if (type == typeof(string)) { return "VARCHAR(20)"; }
-			return string.Empty;
+			return "TEXT";
 		}
 		public static void DropTable(string table)
 		{
