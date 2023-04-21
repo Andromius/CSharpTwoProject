@@ -99,7 +99,7 @@ namespace DataLayer
 			cmd.Parameters.AddWithValue("@id", id);
 			return cmd;
 		}
-		public SQLiteCommand CreateInsertCommand(T obj, SQLiteConnection conn)
+		private SQLiteCommand CreateInsertCommand(T obj, SQLiteConnection conn)
 		{
 			SQLiteCommand cmd = new SQLiteCommand(conn);
 			StringBuilder metaSb = new StringBuilder();
@@ -150,7 +150,7 @@ namespace DataLayer
 			cmd.CommandText = metaSb.ToString();
 			return cmd;
 		}
-		public SQLiteCommand CreateUpdateCommand(T obj, SQLiteConnection conn)
+		private SQLiteCommand CreateUpdateCommand(T obj, SQLiteConnection conn)
 		{
 			SQLiteCommand cmd = new SQLiteCommand(conn);
 			StringBuilder metaSb = new StringBuilder();
