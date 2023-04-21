@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer
 {
+    [DbEntity]
     public class User : DomainObject
 	{
         [DbAttr("name")]
