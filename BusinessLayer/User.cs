@@ -10,10 +10,19 @@ namespace BusinessLayer
     public class User : DomainObject
 	{
         [DbAttr("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 		[DbAttr("surname")]
-		public string Surname { get; set; }
-        public User(string name, string surname, long? id = null) : base(id)
+		public string? Surname { get; set; }
+        [DbIgnore]
+        public bool IsPartial => Name == null;
+		[DbConstructor]
+        public User(string name, string surname, long id) : base(id)
+        {
+            Name = name;
+            Surname = surname;
+        }
+        public User(long id) : base(id) { }
+        public User(string name, string surname) 
         {
             Name = name;
             Surname = surname;
