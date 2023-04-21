@@ -9,8 +9,8 @@ namespace DataLayer
 {
 	public class DataMapper<T> : IDataMappingService<T> where T: DomainObject
 	{
-		private const string connString = "Data Source=database.db; Version = 3;";
-		private readonly string SQL_SELECT = $"SELECT * FROM {typeof(T).Name} WHERE id = @id;";
+		//private const string connString = "Data Source=database.db; Version = 3;";
+		private const string connString = "Data Source=C:\\Users\\marti\\Desktop\\C#\\2.Semestr\\C#Projekt\\TestingConsole\\bin\\Debug\\net6.0\\database.db; Version = 3;";
 		private readonly string SQL_DELETE = $"DELETE FROM {typeof(T).Name} WHERE id = @id;";
 		public async Task<T?> SelectByID(long id)
 		{
@@ -29,7 +29,7 @@ namespace DataLayer
 			await using (SQLiteConnection conn = new SQLiteConnection(connString))
 			{
 				await conn.OpenAsync();
-				await using (SQLiteCommand cmd = CreateSelectCommand(id, conn))
+				await using (SQLiteCommand cmd = CreateSelectCommand(conn, id))
 				{
 					await using (SQLiteDataReader reader = cmd.ExecuteReader())
 					{
@@ -42,6 +42,38 @@ namespace DataLayer
 				}
 			}
 			return obj;
+		}
+
+		public async Task<List<T>> SelectAll()
+		{
+			List<T> objs = new();
+			ConstructorInfo? constructor = typeof(T).GetConstructors()
+								.Where(x => x.GetCustomAttribute(typeof(DbConstructor)) is not null)
+								.FirstOrDefault();
+
+			if (constructor == null)
+			{
+				return objs;
+			}
+
+			object[] parameters = new object[constructor.GetParameters().Length];
+
+			await using (SQLiteConnection conn = new SQLiteConnection(connString))
+			{
+				await conn.OpenAsync();
+				await using (SQLiteCommand cmd = CreateSelectCommand(conn))
+				{
+					await using (SQLiteDataReader reader = cmd.ExecuteReader())
+					{
+						while (await reader.ReadAsync())
+						{
+							reader.GetValues(parameters);
+							objs.Add((T)constructor.Invoke(parameters));
+						}
+					}
+				}
+			}
+			return objs;
 		}
 
 		public async Task<bool> Insert(T obj)
@@ -85,11 +117,18 @@ namespace DataLayer
 			}
 			return rowsAffected;
 		}
-		private SQLiteCommand CreateSelectCommand(long id, SQLiteConnection conn)
+		private SQLiteCommand CreateSelectCommand(SQLiteConnection conn, long? id = null)
 		{
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.Append($"SELECT * FROM {typeof(T).Name}");
 			SQLiteCommand cmd = new SQLiteCommand(conn);
-			cmd.CommandText = SQL_SELECT;
-			cmd.Parameters.AddWithValue("@id", id);
+			if (id.HasValue)
+			{
+				stringBuilder.Append(" WHERE id = @id");
+				cmd.Parameters.AddWithValue("@id", id.Value);
+			}
+			stringBuilder.Append(';');
+			cmd.CommandText = stringBuilder.ToString();
 			return cmd;
 		}
 		private SQLiteCommand CreateDeleteCommand(long id, SQLiteConnection conn)
