@@ -6,7 +6,52 @@
         xmlns:local="clr-namespace:C_Projekt"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <DataGrid ItemsSource="{Binding Reservations}" 
+                  Grid.Row="0" 
+                  Grid.Column="0" 
+                  AutoGenerateColumns="False" 
+                  IsReadOnly="True" 
+                  ColumnWidth="auto"
+                  Width="auto"
+                  Name="dg"
+                  SelectionChanged="Dg_SelectionChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
+                <DataGridTextColumn Header="Date and Time" Binding="{Binding ReservationTime}"/>
+                <DataGridTextColumn Header="ReserveeID" Binding="{Binding Reservee.Id}"/>
+                <DataGridTextColumn Header="ServiceID" Binding="{Binding Service.Id}"/>
+                <DataGridTemplateColumn Header="Actions" Width="100*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Delete" Margin="5 0 0 0" MinWidth="50"/>
+                                <Button Content="Edit" Margin="5 0 0 0" MinWidth="50"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Orientation="Vertical" Grid.Column="1" Margin="5 0 0 0" Background="LightGray">
+            <Label Content="Reservation" FontWeight="ExtraBold" HorizontalAlignment="Center"/>
+            <Label Content="Name:"/>
+            <TextBox Text="{Binding ElementName=dg, Path=SelectedItem.Reservee.Name}" Margin="5 0 5 0"/>
+            <Label Content="Surname:"/>
+            <TextBox Text="{Binding ElementName=dg, Path=SelectedItem.Reservee.Surname}" Margin="5 0 5 0"/>
+            <Label Content="Service:"/>
+            <TextBox Text="{Binding ElementName=dg, Path=SelectedItem.Service.Name}" Margin="5 0 5 0"/>
+            <Label Content="Date:"/>
+            <DatePicker SelectedDate="{Binding ElementName=dg, Path=SelectedItem.ReservationTime}" Margin="5 0 5 0" SelectedDateFormat="Long"/>
+        </StackPanel>
 
     </Grid>
 </Window>
