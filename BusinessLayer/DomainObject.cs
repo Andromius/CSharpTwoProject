@@ -8,7 +8,7 @@ namespace BusinessLayer
 {
 	public abstract class DomainObject
 	{
-        [DbIgnore]
+        [DbPrimaryKey]
         [DbAttr("id")]
         public long? Id { get; set; }
         public DomainObject(long? id = null)
