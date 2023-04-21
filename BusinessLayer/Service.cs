@@ -9,9 +9,15 @@ namespace BusinessLayer
 		public string? Name { get; set; }
         [DbIgnore]
         public bool IsPartial => Name == null;
-        public Service(long id, string? name = null) : base(id)
+        [DbConstructor]
+        public Service(string name, long id) : base(id)
         {
             Id = id;
+            Name = name;
+        }
+        public Service(long id) : base(id) { }
+        public Service(string name)
+        {
             Name = name;
         }
     }
