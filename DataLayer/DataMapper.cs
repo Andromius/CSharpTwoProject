@@ -1,6 +1,7 @@
 ﻿using BusinessLayer;
 using BusinessLayer.Services;
 using System.Data.SQLite;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -98,7 +99,7 @@ namespace DataLayer
 			cmd.Parameters.AddWithValue("@id", id);
 			return cmd;
 		}
-		private SQLiteCommand CreateInsertCommand(T obj, SQLiteConnection conn)
+		public SQLiteCommand CreateInsertCommand(T obj, SQLiteConnection conn)
 		{
 			SQLiteCommand cmd = new SQLiteCommand(conn);
 			StringBuilder metaSb = new StringBuilder();
@@ -110,43 +111,46 @@ namespace DataLayer
 			{
 				var dbAttribute = entityProp.CustomAttributes.First();
 				string dbAttrName;
-				if (dbAttribute.AttributeType == typeof(DbIgnore)) continue;
-				else if (dbAttribute.AttributeType == typeof(DbInner))
+				if (dbAttribute.AttributeType == typeof(DbIgnore) || dbAttribute.AttributeType == typeof(DbPrimaryKey)) continue;
+				else if (dbAttribute.AttributeType == typeof(DbForeignKey))
 				{
 					var innerObj = entityProp.GetValue(obj);
-					PropertyInfo[] properties = innerObj!.GetType().GetRuntimeProperties().ToArray();
-					
-					if (entityProp.PropertyType.BaseType == typeof(object))
-					{
-						foreach (var property in properties)
-						{
-							dbAttrName = property.CustomAttributes.First().ConstructorArguments[0].Value!.ToString()!;
-							metaSb.Append(dbAttrName).Append(',');
-							sb.Append('@').Append(dbAttrName).Append(',');
-							cmd.Parameters.AddWithValue($"@{dbAttrName}", property.GetValue(innerObj));
-						}
-					}
-					else if (entityProp.PropertyType.BaseType == typeof(DomainObject))
-					{
-						dbAttrName = properties.Last().CustomAttributes.Last().ConstructorArguments[0].Value!.ToString()!;
-						metaSb.Append(entityProp.CustomAttributes.Last().ConstructorArguments[0].Value).Append('_').Append(dbAttrName).Append(',');
-						sb.Append('@').Append(entityProp.CustomAttributes.Last().ConstructorArguments[0].Value).Append('_').Append(dbAttrName).Append(',');
-						cmd.Parameters.AddWithValue($"@{entityProp.CustomAttributes.Last().ConstructorArguments[0].Value}_{dbAttrName}", properties.Last().GetValue(innerObj));
-					}
+					PropertyInfo property = innerObj!.GetType()
+														.GetRuntimeProperties()
+														.Where(x => x.CustomAttributes.Any(y => y.AttributeType == typeof(DbPrimaryKey)))
+														.FirstOrDefault()!;
+
+					dbAttrName = property.CustomAttributes.Last().ConstructorArguments[0].Value!.ToString()!;
+					metaSb.Append(entityProp.CustomAttributes.Last().ConstructorArguments[0].Value)
+						.Append('_')
+						.Append(dbAttrName)
+						.Append(',');
+					sb.Append('@')
+						.Append(entityProp.CustomAttributes.Last().ConstructorArguments[0].Value)
+						.Append('_')
+						.Append(dbAttrName)
+						.Append(',');
+					cmd.Parameters.AddWithValue($"@{entityProp.CustomAttributes.Last().ConstructorArguments[0].Value}_{dbAttrName}", property.GetValue(innerObj));
 					continue;
 				}
 				dbAttrName = dbAttribute.ConstructorArguments[0].Value!.ToString()!;
-				metaSb.Append(dbAttrName).Append(',');
-				sb.Append('@').Append(dbAttrName).Append(',');
+				metaSb.Append(dbAttrName)
+					.Append(',');
+				sb.Append('@')
+					.Append(dbAttrName)
+					.Append(',');
 				cmd.Parameters.AddWithValue($"@{dbAttrName}", entityProp.GetValue(obj));
 			}
-			metaSb.Remove(metaSb.Length - 1, 1).Append(") VALUES ");
-			sb.Remove(sb.Length - 1, 1).Append(')').Append(';');
+			metaSb.Remove(metaSb.Length - 1, 1)
+				.Append(") VALUES ");
+			sb.Remove(sb.Length - 1, 1)
+				.Append(')')
+				.Append(';');
 			metaSb.Append(sb);
 			cmd.CommandText = metaSb.ToString();
 			return cmd;
 		}
-		private SQLiteCommand CreateUpdateCommand(T obj, SQLiteConnection conn)
+		public SQLiteCommand CreateUpdateCommand(T obj, SQLiteConnection conn)
 		{
 			SQLiteCommand cmd = new SQLiteCommand(conn);
 			StringBuilder metaSb = new StringBuilder();
@@ -156,37 +160,25 @@ namespace DataLayer
 			{
 				var dbAttribute = entityProp.CustomAttributes.First();
 				string dbAttrName;
-				if (dbAttribute.AttributeType == typeof(DbIgnore)) continue;
-				else if (dbAttribute.AttributeType == typeof(DbInner))
+				if (dbAttribute.AttributeType == typeof(DbIgnore) || dbAttribute.AttributeType == typeof(DbPrimaryKey)) continue;
+				else if (dbAttribute.AttributeType == typeof(DbForeignKey))
 				{
 					var innerObj = entityProp.GetValue(obj);
-					PropertyInfo[] properties = innerObj!.GetType().GetRuntimeProperties().ToArray();
-
-					if (entityProp.PropertyType.BaseType == typeof(object))
-					{
-						foreach (var property in properties)
-						{
-							dbAttrName = property.CustomAttributes.First().ConstructorArguments[0].Value!.ToString()!;
-							metaSb.Append(dbAttrName)
-								.Append(" = @")
-								.Append(dbAttrName)
-								.AppendLine(",");
-							cmd.Parameters.AddWithValue($"@{dbAttrName}", property.GetValue(innerObj));
-						}
-					}
-					else if (entityProp.PropertyType.BaseType == typeof(DomainObject))
-					{
-						dbAttrName = properties.Last().CustomAttributes.Last().ConstructorArguments[0].Value!.ToString()!;
-						metaSb.Append(entityProp.CustomAttributes.Last().ConstructorArguments[0].Value)
-							.Append('_')
-							.Append(dbAttrName)
-							.Append(" = @")
-							.Append(entityProp.CustomAttributes.Last().ConstructorArguments[0].Value)
-							.Append('_')
-							.Append(dbAttrName)
-							.AppendLine(",");
-						cmd.Parameters.AddWithValue($"@{entityProp.CustomAttributes.Last().ConstructorArguments[0].Value}_{dbAttrName}", properties.Last().GetValue(innerObj));
-					}
+					PropertyInfo property = innerObj!.GetType()
+														.GetRuntimeProperties()
+														.Where(x => x.CustomAttributes.Any(y => y.AttributeType == typeof(DbPrimaryKey)))
+														.FirstOrDefault()!;
+					Console.WriteLine(property.Name);
+					dbAttrName = property.CustomAttributes.Last().ConstructorArguments[0].Value!.ToString()!;
+					metaSb.Append(entityProp.CustomAttributes.Last().ConstructorArguments[0].Value)
+						.Append('_')
+						.Append(dbAttrName)
+						.Append(" = @")
+						.Append(entityProp.CustomAttributes.Last().ConstructorArguments[0].Value)
+						.Append('_')
+						.Append(dbAttrName)
+						.AppendLine(",");
+					cmd.Parameters.AddWithValue($"@{entityProp.CustomAttributes.Last().ConstructorArguments[0].Value}_{dbAttrName}", property.GetValue(innerObj));
 					continue;
 				}
 				dbAttrName = dbAttribute.ConstructorArguments[0].Value!.ToString()!;
@@ -200,7 +192,6 @@ namespace DataLayer
 			metaSb.Append("WHERE id = @id;");
 			cmd.Parameters.AddWithValue("@id", obj.Id!.Value);
 			cmd.CommandText = metaSb.ToString();
-			Console.WriteLine(metaSb.ToString());
 			return cmd;
 		}
 	}
