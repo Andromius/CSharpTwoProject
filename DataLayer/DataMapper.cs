@@ -1,7 +1,6 @@
 ﻿using BusinessLayer;
 using BusinessLayer.Services;
 using System.Data.SQLite;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -9,10 +8,9 @@ namespace DataLayer
 {
 	public class DataMapper<T> : IDataMappingService<T> where T: DomainObject
 	{
-		//private const string connString = "Data Source=database.db; Version = 3;";
-		private const string connString = "Data Source=C:\\Users\\marti\\Desktop\\C#\\2.Semestr\\C#Projekt\\TestingConsole\\bin\\Debug\\net6.0\\database.db; Version = 3;";
+		protected const string connString = "Data Source=database.db; Version = 3;";
 		private readonly string SQL_DELETE = $"DELETE FROM {typeof(T).Name} WHERE id = @id;";
-		public async Task<T?> SelectByID(long id)
+		public async Task<T?> SelectWithCondition(Dictionary<string, object> conditionParameters)
 		{
 			T? obj = null;
 			ConstructorInfo? constructor = typeof(T).GetConstructors()
@@ -29,7 +27,7 @@ namespace DataLayer
 			await using (SQLiteConnection conn = new SQLiteConnection(connString))
 			{
 				await conn.OpenAsync();
-				await using (SQLiteCommand cmd = CreateSelectCommand(conn, id))
+				await using (SQLiteCommand cmd = CreateSelectCommand(conn, conditionParameters))
 				{
 					await using (SQLiteDataReader reader = cmd.ExecuteReader())
 					{
@@ -117,18 +115,24 @@ namespace DataLayer
 			}
 			return rowsAffected;
 		}
-		private SQLiteCommand CreateSelectCommand(SQLiteConnection conn, long? id = null)
+		public SQLiteCommand CreateSelectCommand(SQLiteConnection conn, Dictionary<string, object>? conditionParameters = null)
 		{
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.Append($"SELECT * FROM {typeof(T).Name}");
 			SQLiteCommand cmd = new SQLiteCommand(conn);
-			if (id.HasValue)
+			if (conditionParameters is not null)
 			{
-				stringBuilder.Append(" WHERE id = @id");
-				cmd.Parameters.AddWithValue("@id", id.Value);
+				stringBuilder.Append(" WHERE ");
+				foreach (KeyValuePair<string, object> item in conditionParameters)
+				{
+					stringBuilder.Append(item.Key).Append(" = @").Append(item.Key).Append(" AND ");
+					cmd.Parameters.AddWithValue($"@{item.Key}", item.Value);
+				}
+				stringBuilder.Remove(stringBuilder.Length - 5, 5);
 			}
 			stringBuilder.Append(';');
 			cmd.CommandText = stringBuilder.ToString();
+			Console.WriteLine(cmd.CommandText);
 			return cmd;
 		}
 		private SQLiteCommand CreateDeleteCommand(long id, SQLiteConnection conn)
