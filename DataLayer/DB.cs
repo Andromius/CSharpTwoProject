@@ -9,7 +9,7 @@ namespace DataLayer
 	public class DB
 	{
 		//HairdresserDB
-		private const string connString = "Data Source=database.db; Version = 3;";
+		private static readonly string connString = $"Data Source={System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\HairdresserDB.db; Version = 3;";
 
 		public static void CreateTables()
 		{
@@ -74,10 +74,12 @@ namespace DataLayer
 				new User("Pepa", "Novak", "pepa@novak.cz", "password"),
 				new User("Karel", "Novak", "karel@novak.cz", "password")
 			};
+			sampleUsers[0].Id = 1;
+			sampleUsers[1].Id = 2;
 			List<Service> sampleServices = new List<Service>()
 			{
-				new Service("Strih"),
-				new Service("Umyti vlasu")
+				new Service("Strih", 1),
+				new Service("Umyti vlasu", 2)
 			};
 			List<Reservation> sampleReservations = new List<Reservation>()
 			{
