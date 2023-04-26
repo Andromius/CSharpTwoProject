@@ -20,6 +20,7 @@ namespace DataLayer
 				{
 					cmd.ExecuteNonQuery();
 				}
+				FillWithData();
 			}
 		}
 
@@ -66,6 +67,31 @@ namespace DataLayer
 			return command;
 		}
 
+		private static void FillWithData()
+		{
+			List<User> sampleUsers = new List<User>() 
+			{ 
+				new User("Pepa", "Novak", "pepa@novak.cz", "password"),
+				new User("Karel", "Novak", "karel@novak.cz", "password")
+			};
+			List<Service> sampleServices = new List<Service>()
+			{
+				new Service("Strih"),
+				new Service("Umyti vlasu")
+			};
+			List<Reservation> sampleReservations = new List<Reservation>()
+			{
+				new Reservation(sampleUsers[0], new DateTime(2023, 4, 25, 16, 30, 0), new DateTime(2023, 4, 25, 18, 0, 0), sampleServices[0]),
+				new Reservation(sampleUsers[1], new DateTime(2023, 4, 25, 15, 0, 0), new DateTime(2023, 4, 25, 16, 30, 0), sampleServices[1])
+			};
+			DataMapper<User> userDataMapper = new DataMapper<User>();
+			DataMapper<Service> serviceDataMapper = new DataMapper<Service>();
+			DataMapper<Reservation> reservationDataMapper = new DataMapper<Reservation>();
+			sampleUsers.ForEach(async user => { await userDataMapper.Insert(user); });
+			sampleServices.ForEach(async service => { await serviceDataMapper.Insert(service); });
+			sampleReservations.ForEach(async reservation => { await reservationDataMapper.Insert(reservation); });
+		}
+
 
 		private static List<Type> GetDbEntities(Assembly assembly)
 		{
@@ -90,8 +116,8 @@ namespace DataLayer
 
 			if (type == typeof(long)) { return "INTEGER"; }
 			else if (type == typeof(int)) { return "INT"; }
-			else if (type == typeof(DateTime)) { return "DATETIME"; }
 			else if (type == typeof(string)) { return "VARCHAR(20)"; }
+			else if (type == typeof(DateTime)) { return "DATE"; }
 			return "TEXT";
 		}
 		public static void DropTable(string table)
