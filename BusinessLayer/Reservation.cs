@@ -13,7 +13,7 @@ namespace BusinessLayer
 	{
 		[DbForeignKey]
 		[DbAttr("user")]
-		public User Reservee { get; set; }
+		public User Reservee { private get; set; }
 		
 		[DbAttr("reservation_start")]
 		public DateTime ReservationStart { get; set; }
@@ -22,7 +22,7 @@ namespace BusinessLayer
 
 		[DbForeignKey]
 		[DbAttr("service")]
-		public Service Service { get; set; }
+		public Service Service { private get; set; }
 
 		[DbConstructor]
 		public Reservation(long userId, DateTime reservationStart, DateTime reservationEnd, long serviceId, long id) : base(id)
