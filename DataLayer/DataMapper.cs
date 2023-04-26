@@ -8,7 +8,7 @@ namespace DataLayer
 {
 	public class DataMapper<T> : IDataMappingService<T> where T: DomainObject
 	{
-		protected const string connString = "Data Source=database.db; Version = 3;";
+		private const string connString = "Data Source=database.db; Version = 3;";
 		private readonly string SQL_DELETE = $"DELETE FROM {typeof(T).Name} WHERE id = @id;";
 		public async Task<T?> SelectWithCondition(Dictionary<string, object> conditionParameters)
 		{
@@ -115,7 +115,7 @@ namespace DataLayer
 			}
 			return rowsAffected;
 		}
-		public SQLiteCommand CreateSelectCommand(SQLiteConnection conn, Dictionary<string, object>? conditionParameters = null)
+		private SQLiteCommand CreateSelectCommand(SQLiteConnection conn, Dictionary<string, object>? conditionParameters = null)
 		{
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.Append($"SELECT * FROM {typeof(T).Name}");
