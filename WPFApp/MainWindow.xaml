@@ -8,7 +8,7 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -21,18 +21,20 @@
                   IsReadOnly="True" 
                   ColumnWidth="auto"
                   Width="auto"
-                  Name="dg"
+                  Name="Dg"
+                  MouseDoubleClick="Dg_MouseDoubleClick"
                   SelectionChanged="Dg_SelectionChanged">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
-                <DataGridTextColumn Header="Date and Time" Binding="{Binding ReservationTime}"/>
+                <DataGridTextColumn Header="ReservationStart" Binding="{Binding ReservationStart}"/>
+                <DataGridTextColumn Header="ReservationEnd" Binding="{Binding ReservationEnd}"/>
                 <DataGridTextColumn Header="ReserveeID" Binding="{Binding Reservee.Id}"/>
                 <DataGridTextColumn Header="ServiceID" Binding="{Binding Service.Id}"/>
                 <DataGridTemplateColumn Header="Actions" Width="100*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <Button Content="Delete" Margin="5 0 0 0" MinWidth="50"/>
+                                <Button Content="Delete" Margin="5 0 0 0" MinWidth="50" Click="DeleteButton_Click"/>
                                 <Button Content="Edit" Margin="5 0 0 0" MinWidth="50"/>
                             </StackPanel>
                         </DataTemplate>
@@ -40,18 +42,33 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-
-        <StackPanel Orientation="Vertical" Grid.Column="1" Margin="5 0 0 0" Background="LightGray">
-            <Label Content="Reservation" FontWeight="ExtraBold" HorizontalAlignment="Center"/>
-            <Label Content="Name:"/>
-            <TextBox Text="{Binding ElementName=dg, Path=SelectedItem.Reservee.Name}" Margin="5 0 5 0"/>
-            <Label Content="Surname:"/>
-            <TextBox Text="{Binding ElementName=dg, Path=SelectedItem.Reservee.Surname}" Margin="5 0 5 0"/>
-            <Label Content="Service:"/>
-            <TextBox Text="{Binding ElementName=dg, Path=SelectedItem.Service.Name}" Margin="5 0 5 0"/>
-            <Label Content="Date:"/>
-            <DatePicker SelectedDate="{Binding ElementName=dg, Path=SelectedItem.ReservationTime}" Margin="5 0 5 0" SelectedDateFormat="Long"/>
-        </StackPanel>
-
+        <Grid Grid.Column="1" Background="LightGray" Margin="5 0 0 0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0 0 0 0">
+                <Label Content="Reservation detail" FontWeight="ExtraBold" HorizontalAlignment="Center"/>
+                <Label Content="Name:"/>
+                <TextBox IsReadOnly="True" Margin="5 0 5 0"/>
+                <Label Content="Surname:"/>
+                <TextBox Margin="5 0 5 0"/>
+                <Label Content="Service:"/>
+                <TextBox IsReadOnly="True" Margin="5 0 5 0"/>
+                <Label Content="Reservation start:"/>
+                <TextBox Margin="5 0 5 0" IsReadOnly="True"/>
+                <Label Content="Reservation end:"/>
+                <TextBox Margin="5 0 5 0" IsReadOnly="True"/>
+            </StackPanel>
+            <Grid HorizontalAlignment="Stretch" Grid.Row="1" VerticalAlignment="Bottom" Margin="0 0 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Button Content="Clear" Grid.Column="0" Margin="5 0 5 0" Click="Clear_Click"></Button>
+                <Button Content="Save" Grid.Column="1" Margin="5 0 5 0" Click="Save_Click"></Button>
+            </Grid>
+        </Grid>
+        
     </Grid>
 </Window>

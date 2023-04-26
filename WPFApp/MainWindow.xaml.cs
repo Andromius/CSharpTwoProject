@@ -3,6 +3,7 @@ using DataLayer;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,13 +37,25 @@ namespace C_Projekt
 			List<Reservation> reservations = await new DataMapper<Reservation>().SelectAll();
 			Reservations = new ObservableCollection<Reservation>(reservations);
 		}
-		private async void Dg_SelectionChanged(object sender, SelectionChangedEventArgs e)
+
+		private async void DeleteButton_Click(object sender, RoutedEventArgs e)
+		{
+			Button button = (Button)sender;
+			Reservation reservation = (Reservation)button.DataContext;
+			if (await new DataMapper<Reservation>().Delete(reservation) > 0)
+			{ 
+				Reservations.Remove(reservation); 
+			}
+        }
+
+		private async void Dg_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
 			DataGrid grid = (DataGrid)sender;
 			var cells = grid.SelectedCells;
 			Reservation r = (Reservation)cells[0].Item;
 			Grid windowGrid = (Grid)Content;
-			StackPanel sp = (StackPanel)windowGrid.Children[1];
+			Grid detailGrid = (Grid)windowGrid.Children[1];
+			StackPanel sp = (StackPanel)detailGrid.Children[0];
 			TextBox[] textBoxes = sp.Children.OfType<TextBox>().ToArray();
 			if (r != null)
 			{
@@ -51,11 +64,49 @@ namespace C_Projekt
 				textBoxes[0].Text = u.Name;
 				textBoxes[1].Text = u.Surname;
 				textBoxes[2].Text = s.Name;
+				textBoxes[3].Text = r.ReservationStart.ToString();
+				textBoxes[4].Text = r.ReservationEnd.ToString();
 				return;
 			}
-			textBoxes[0].Text = "";
-			textBoxes[1].Text = "";
-			textBoxes[2].Text = "";
+			IEnumerable<TextBox> textboxes = sp.Children.OfType<TextBox>();
+			foreach (TextBox textbox in textboxes)
+			{
+				textbox.Text = "";
+			}
+		}
+
+		private void Save_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void Clear_Click(object sender, RoutedEventArgs e)
+		{
+			Grid windowGrid = (Grid)Content;
+			Grid detailGrid = (Grid)windowGrid.Children[1];
+			StackPanel sp = (StackPanel)detailGrid.Children[0];
+			IEnumerable<TextBox> textboxes = sp.Children.OfType<TextBox>();
+			foreach (TextBox textbox in textboxes)
+			{
+				textbox.Text = "";
+			}
+		}
+
+		public void Dg_Selected(object sender, RoutedEventArgs e)
+		{
+			DataGrid dataGrid = (DataGrid)sender;
+		}
+
+		private void Dg_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			Grid windowGrid = (Grid)Content;
+			Grid detailGrid = (Grid)windowGrid.Children[1];
+			StackPanel sp = (StackPanel)detailGrid.Children[0];
+			IEnumerable<TextBox> textboxes = sp.Children.OfType<TextBox>();
+			foreach (TextBox textbox in textboxes)
+			{
+				textbox.Text = "";
+			}
 		}
 	}
 }
