@@ -15,41 +15,40 @@ namespace BusinessLayer
 		[DbAttr("user")]
 		public User Reservee { get; set; }
 		
-		[DbAttr("date_time_reservation")]
-		public DateTime ReservationTime { get; set; }
+		[DbAttr("reservation_start")]
+		public DateTime ReservationStart { get; set; }
+		[DbAttr("reservation_end")]
+		public DateTime ReservationEnd { get; set; }
 
 		[DbForeignKey]
 		[DbAttr("service")]
 		public Service Service { get; set; }
 
 		[DbConstructor]
-		public Reservation(long userId, DateTime reservationTime, long serviceId, long id) : base(id)
+		public Reservation(long userId, DateTime reservationStart, DateTime reservationEnd, long serviceId, long id) : base(id)
         {
 			Reservee = new User(userId);
-			ReservationTime = reservationTime;
+			ReservationStart = reservationStart;
+			ReservationEnd = reservationEnd;
 			Service = new Service(serviceId);
         }
-		public Reservation(User reservee, DateTime reservationTime, Service service)
+		public Reservation(User reservee, DateTime reservationStart, DateTime reservationEnd, Service service)
 		{
 			Reservee = reservee;
-			ReservationTime = reservationTime;
+			ReservationStart = reservationStart;
+			ReservationEnd = reservationEnd;
 			Service = service;
 		}
-		public override string ToString()
-		{
-			return $"{Id} {Reservee.Name} {Reservee.Surname} {ReservationTime} {Service.Id}";
-		}
-
 		public async Task<User> GetReservee(IDataMappingService<User> dataMapper)
 		{
 			if (Reservee.IsPartial)
-				Reservee = await dataMapper.SelectByID(Reservee.Id.Value);
+				Reservee = await dataMapper.SelectWithCondition(new Dictionary<string, object>() { { "user_id", Reservee.Id.Value } });
 			return Reservee;
 		}
 		public async Task<Service> GetService(IDataMappingService<Service> dataMapper)
 		{
 			if (Service.IsPartial)
-				Service = await dataMapper.SelectByID(Service.Id.Value);
+				Service = await dataMapper.SelectWithCondition(new Dictionary<string, object>() { { "service_id", Service.Id.Value } });
 			return Service;
 		}
 
