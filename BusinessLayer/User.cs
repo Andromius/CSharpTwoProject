@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace BusinessLayer
@@ -19,6 +20,7 @@ namespace BusinessLayer
 		[DbAttr("pass")]
 		public string? Password { get; set; }
         [DbIgnore]
+        [JsonIgnore]
         public bool IsPartial => Name == null;
 		[DbConstructor]
         public User(string name, string surname, string email, string password, long id) : base(id)
@@ -28,6 +30,7 @@ namespace BusinessLayer
             Email = email;
             Password = password;
         }
+        public User() : base() { }
         public User(long id) : base(id) { }
         public User(string name, string surname, string email, string password) 
         {
