@@ -39,7 +39,7 @@ namespace WebApp.Controllers
 				{
 					await JsonSerializer.SerializeAsync(stream, u);
 					HttpContext.Session.Set("user", stream.ToArray());
-					return RedirectToAction("Reservation", "Home");
+					return RedirectToAction("Index", "Home");
 				}
 			}
 			ViewBag.Message = "Invalid credentials";
