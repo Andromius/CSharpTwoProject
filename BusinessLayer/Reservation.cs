@@ -42,13 +42,13 @@ namespace BusinessLayer
 		public async Task<User> GetReservee(IDataMappingService<User> dataMapper)
 		{
 			if (Reservee.IsPartial)
-				Reservee = await dataMapper.SelectWithCondition(new Dictionary<string, object>() { { "user_id", Reservee.Id.Value } });
+				Reservee = await dataMapper.SelectWithCondition(new Dictionary<string, object>() { { "id", Reservee.Id.Value } });
 			return Reservee;
 		}
 		public async Task<Service> GetService(IDataMappingService<Service> dataMapper)
 		{
 			if (Service.IsPartial)
-				Service = await dataMapper.SelectWithCondition(new Dictionary<string, object>() { { "service_id", Service.Id.Value } });
+				Service = await dataMapper.SelectWithCondition(new Dictionary<string, object>() { { "id", Service.Id.Value } });
 			return Service;
 		}
 
