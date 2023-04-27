@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using BusinessLayer;
+@using System.Text.Json;
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -20,13 +22,30 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Reservations</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Reservation">Reserve</a>
                         </li>
                     </ul>
                 </div>
+                @{
+                    if(this.Context.Session.Get("user") is null)
+                    {
+                        <label for="loginButton" class="nav-link text-dark">Not logged in</label>
+                        <button id="logoutButton" type="button" value="Log In" class="btn btn-outline-success" onclick="location.href='@Url.Action("Index", "Login")'" >Log In</button>
+                    }
+                    else
+                    {
+                        User u;
+                        await using (MemoryStream memoryStream = new MemoryStream(this.Context.Session.Get("user")))
+                        {
+                            u = await JsonSerializer.DeserializeAsync<BusinessLayer.User>(memoryStream);
+                        }
+                        <label class="nav-link text-dark">Welcome @u!.Name @u.Surname</label>
+                        <button id="logoutButton" type="button" class="btn btn-outline-danger" onclick="location.href='@Url.Action("Index", "Login")'" >Log Out</button>
+                    }
+                }
             </div>
         </nav>
     </header>
@@ -38,7 +57,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2023 - WebApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2023 - WebApp
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

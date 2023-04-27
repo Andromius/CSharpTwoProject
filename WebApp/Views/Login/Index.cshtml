@@ -1,0 +1,15 @@
+﻿@model LoginForm
+@using(Html.BeginForm())
+{
+	<div class="mb-3">
+		@Html.LabelFor(x => x.Email, new Dictionary<string, object>() { {"class", "form-label"} })
+		@Html.TextBoxFor(x => x.Email, new Dictionary<string, object>() { {"class", "form-control"} })
+		@Html.ValidationMessageFor(x => x.Email)
+	</div>
+	<div class="mb-3">
+		@Html.LabelFor(x => x.Password, new Dictionary<string, object>() { {"class", "form-label"} })
+		@Html.TextBoxFor(x => x.Password, new Dictionary<string, object>() { {"class", "form-control"} })
+		@Html.ValidationMessageFor(x => x.Password)
+	</div>
+	<button class="btn btn-primary" type="submit">Log In</button><text>@ViewBag.Message</text>
+}

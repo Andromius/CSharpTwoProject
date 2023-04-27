@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BusinessLayer;
+using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Text;
+using System.Text.Json;
 using WebApp.Models;
 
 namespace WebApp.Controllers
@@ -13,13 +16,35 @@ namespace WebApp.Controllers
 			_logger = logger;
 		}
 
-		public IActionResult Index()
+		public async Task<IActionResult> Index()
 		{
+            if (HttpContext.Session.GetString("user") is null)
+            {
+                return Unauthorized("You must be logged in to view this page!");
+            }
+
+            User u;
+            await using (MemoryStream memoryStream = new MemoryStream(HttpContext.Session.Get("user")))
+            {
+                u = await JsonSerializer.DeserializeAsync<BusinessLayer.User>(memoryStream);
+            }
+            ViewBag.List = await new DataLayer.DataMapper<Reservation>().SelectAll(new Dictionary<string, object>() { { "user_id", u!.Id!.Value} });
 			return View();
 		}
 
-		public IActionResult Privacy()
+		public async Task<IActionResult> Reservation() 
 		{
+			if (HttpContext.Session.GetString("user") is null)
+			{
+				return Unauthorized("You must be logged in to view this page!");
+			}
+
+			User u;
+			await using (MemoryStream memoryStream = new MemoryStream(HttpContext.Session.Get("user")))
+			{
+				u = await JsonSerializer.DeserializeAsync<BusinessLayer.User>(memoryStream);
+			}
+			ViewBag.User = u;
 			return View();
 		}
 

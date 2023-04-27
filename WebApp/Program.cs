@@ -1,6 +1,12 @@
+using BusinessLayer;
+using BusinessLayer.Services;
+using BusinessLayer.Services.AuthServices;
+using DataLayer;
+using Microsoft.AspNet.Identity;
+
 namespace WebApp
 {
-	public class Program
+    public class Program
 	{
 		public static void Main(string[] args)
 		{
@@ -8,6 +14,11 @@ namespace WebApp
 
 			// Add services to the container.
 			builder.Services.AddControllersWithViews();
+			builder.Services.AddSession();
+
+			builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
+			builder.Services.AddSingleton<IDataMappingService<User>, DataMapper<User>>();
+			builder.Services.AddScoped<IAccountService, AccountService>();
 
 			var app = builder.Build();
 
@@ -20,6 +31,7 @@ namespace WebApp
 			}
 
 			app.UseHttpsRedirection();
+			app.UseSession();
 			app.UseStaticFiles();
 
 			app.UseRouting();
@@ -28,7 +40,7 @@ namespace WebApp
 
 			app.MapControllerRoute(
 				name: "default",
-				pattern: "{controller=Home}/{action=Index}/{id?}");
+				pattern: "{controller=Login}/{action=Index}/{id?}");
 
 			app.Run();
 		}

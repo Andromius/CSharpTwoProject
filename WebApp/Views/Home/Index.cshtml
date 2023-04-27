@@ -1,8 +1,21 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using BusinessLayer;
+@using DataLayer;
+@{
+    ViewData["Title"] = "Reservations";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <ul class="list-group">
+        @foreach(Reservation r in ViewBag.List)
+        {
+            <li class="list-group-item">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@r.GetService(new DataMapper<Service>()).Result.Name</h5>
+                        <h6 class="card-subtitle mb-2 text-body-secondary">@r.ReservationStart.ToString("HH:mm") - @r.ReservationEnd.ToString("HH:mm")</h6>
+                    </div>
+                </div>
+            </li>
+        }
+    </ul>
 </div>
