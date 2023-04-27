@@ -42,7 +42,7 @@ namespace DataLayer
 			return obj;
 		}
 
-		public async Task<List<T>> SelectAll()
+		public async Task<List<T>> SelectAll(Dictionary<string, object>? conditionParameters = null)
 		{
 			List<T> objs = new();
 			ConstructorInfo? constructor = typeof(T).GetConstructors()
@@ -59,7 +59,7 @@ namespace DataLayer
 			await using (SQLiteConnection conn = new SQLiteConnection(connString))
 			{
 				await conn.OpenAsync();
-				await using (SQLiteCommand cmd = CreateSelectCommand(conn))
+				await using (SQLiteCommand cmd = CreateSelectCommand(conn, conditionParameters))
 				{
 					await using (SQLiteDataReader reader = cmd.ExecuteReader())
 					{
@@ -132,7 +132,6 @@ namespace DataLayer
 			}
 			stringBuilder.Append(';');
 			cmd.CommandText = stringBuilder.ToString();
-			Console.WriteLine(cmd.CommandText);
 			return cmd;
 		}
 		private SQLiteCommand CreateDeleteCommand(long id, SQLiteConnection conn)
