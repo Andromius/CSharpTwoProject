@@ -32,7 +32,7 @@ namespace WebApp.Controllers
 			return View();
 		}
 
-		public async Task<IActionResult> Reservation() 
+		public async Task<IActionResult> Reserve() 
 		{
 			if (HttpContext.Session.GetString("user") is null)
 			{
