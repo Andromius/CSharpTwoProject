@@ -1,8 +1,11 @@
 using BusinessLayer;
 using BusinessLayer.Services;
 using BusinessLayer.Services.AuthServices;
+using BusinessLayer.Services.FormValidationService;
+using BusinessLayer.Services.ReservationService;
 using DataLayer;
 using Microsoft.AspNet.Identity;
+using WebApp.Models;
 
 namespace WebApp
 {
@@ -18,6 +21,10 @@ namespace WebApp
 
 			builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 			builder.Services.AddSingleton<IDataMappingService<User>, DataMapper<User>>();
+			builder.Services.AddSingleton<IDataMappingService<Reservation>, DataMapper<Reservation>>();
+			builder.Services.AddSingleton<IDataMappingService<Service>, DataMapper<Service>>();
+			builder.Services.AddSingleton<IFormValidationService<ReservationForm>, ReservationValidationService>();
+			builder.Services.AddScoped<IReservationService, ReservationService>();
 			builder.Services.AddScoped<IAccountService, AccountService>();
 
 			var app = builder.Build();

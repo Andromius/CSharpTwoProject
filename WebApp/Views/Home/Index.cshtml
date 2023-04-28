@@ -3,16 +3,18 @@
 @{
     ViewData["Title"] = "Reservations";
 }
-
 <div class="text-center">
+    <h2>Current reservations:</h2>
     <ul class="list-group">
         @foreach(Reservation r in ViewBag.List)
         {
+            Service s = await r.GetService(new DataMapper<Service>());
             <li class="list-group-item">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">@r.GetService(new DataMapper<Service>()).Result.Name</h5>
-                        <h6 class="card-subtitle mb-2 text-body-secondary">@r.ReservationStart.ToString("HH:mm") - @r.ReservationEnd.ToString("HH:mm")</h6>
+                        <h5 class="card-title">@s.Name</h5>
+                        <h6 class="card-subtitle mb-2 text-body-secondary">@r.ReservationStart.ToString("dd.MM.yyyy") : @r.ReservationStart.ToString("HH:mm") - @r.ReservationEnd.ToString("HH:mm")</h6>
+                        <asp:Button type="button" class="btn btn-danger" runat="server" OnClick="location.href='@Url.Action("Remove", "Home", new { id = r.Id.Value})'">Cancel</asp:Button>
                     </div>
                 </div>
             </li>

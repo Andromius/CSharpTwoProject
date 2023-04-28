@@ -1,1 +1,64 @@
-﻿<h1>Welcome @ViewBag.User.Id @ViewBag.User.Email @ViewBag.User.Password @ViewBag.User.Name @ViewBag.User.Surname</h1>
+﻿@using BusinessLayer;
+@using DataLayer;
+@{
+    ViewData["Title"] = "Reserve";
+}
+@{
+	ViewBag.TimesList = new List<SelectListItem>()
+	{
+		new SelectListItem("Choose time", "", true, true),
+		new SelectListItem("13:30 - 15:00", "13:30 - 15:00"),
+		new SelectListItem("15:00 - 16:30", "15:00 - 16:30"),
+		new SelectListItem("16:30 - 18:00", "16:30 - 18:00"),
+		new SelectListItem("18:00 - 19:30", "18:00 - 19:30")
+	};
+
+	List<SelectListItem> selectListItems = new List<SelectListItem>();
+	List<Service> services = await new DataMapper<Service>().SelectAll();
+
+	selectListItems.Add(new SelectListItem("Select service", "", true, true));
+	foreach (Service s in services)
+    {
+		selectListItems.Add(new SelectListItem(s.Name, s.Id.Value.ToString()));
+    }
+    ViewBag.Services = selectListItems;
+}
+<h2>Reserve:</h2>
+@{
+	if(ViewBag.ValidationMessage is not null)
+	{
+		<div class="alert alert-warning alert-dismissible fade show" role="alert">
+			<strong>Warning!</strong>
+			<ul>
+				@foreach (string line in ViewBag.ValidationMessage)
+				{
+					if(!string.IsNullOrEmpty(line))
+					{
+						<li>@line</li>
+					}	
+				}
+			</ul>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+	}
+}
+@model ReservationForm
+@using (Html.BeginForm())
+{
+	<div class="mb-3">
+		@Html.LabelFor(x => x.ReservationDate, new Dictionary<string, object>() { {"class", "form-label"} })
+		@Html.TextBoxFor(x => x.ReservationDate, new Dictionary<string, object>() { {"class", "form-control"}, {"type", "date"} })
+	</div>
+	<div class="mb-3">
+		@Html.LabelFor(x => x.ReservationTime, new Dictionary<string, object>() { {"class", "form-label"} })
+		@Html.DropDownListFor(x => x.ReservationTime, (List<SelectListItem>)ViewBag.TimesList, 
+			new Dictionary<string, object>() { {"class", "form-select"} })
+	</div>
+	<div class="mb-3">
+		@Html.LabelFor(x => x.ServiceID, new Dictionary<string, object>() { {"class", "form-label"} })
+		@Html.DropDownListFor(x => x.ServiceID,(List<SelectListItem>)ViewBag.Services,
+			new Dictionary<string, object>() { {"class", "form-select"} })
+	</div>
+
+	<button id="submitBut" class="btn btn-primary" type="submit">Submit</button>
+}
