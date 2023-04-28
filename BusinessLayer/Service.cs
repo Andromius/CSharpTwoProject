@@ -1,12 +1,14 @@
-﻿using System.Reflection.Metadata.Ecma335;
+﻿using System.ComponentModel;
+using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 
 namespace BusinessLayer
 {
     [DbEntity]
     public class Service : DomainObject
 	{
-		[DbAttr("name")]
-		public string? Name { get; set; }
+        [DbAttr("name")]
+        public string? Name { get; set; }
         [DbIgnore]
         public bool IsPartial => Name == null;
         [DbConstructor]
@@ -20,5 +22,10 @@ namespace BusinessLayer
         {
             Name = name;
         }
-    }
+        public Service() : base() { }
+		public override string ToString()
+		{
+            return $"{Name}";
+		}
+	}
 }
