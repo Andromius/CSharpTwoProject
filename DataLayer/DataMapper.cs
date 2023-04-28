@@ -9,7 +9,7 @@ namespace DataLayer
 	public class DataMapper<T> : IDataMappingService<T> where T : DomainObject
 	{
 		private readonly string connString = $"Data Source={System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\HairdresserDB.db; Version = 3;";
-		private readonly string SQL_DELETE = $"DELETE FROM {typeof(T).Name} WHERE id = @id;";	
+		private readonly string SQL_DELETE = $"PRAGMA foreign_keys = YES;DELETE FROM {typeof(T).Name} WHERE id = @id;";	
 		public async Task<T?> SelectWithCondition(Dictionary<string, object> conditionParameters)
 		{
 			T? obj = null;
@@ -82,7 +82,8 @@ namespace DataLayer
 				await conn.OpenAsync();
 				await using (SQLiteCommand cmd = CreateInsertCommand(obj, conn))
 				{
-					rowsAffected = await cmd.ExecuteNonQueryAsync();
+					try { rowsAffected = await cmd.ExecuteNonQueryAsync(); }
+					catch { return rowsAffected > 0; }
 				}
 			}
 			return rowsAffected > 0;
@@ -96,7 +97,8 @@ namespace DataLayer
 				await conn.OpenAsync();
 				await using (SQLiteCommand cmd = CreateDeleteCommand(obj.Id!.Value, conn))
 				{
-					rowsAffected = await cmd.ExecuteNonQueryAsync();
+					try { rowsAffected = await cmd.ExecuteNonQueryAsync(); }
+					catch { return rowsAffected; }
 				}
 			}
 			return rowsAffected;
@@ -110,7 +112,8 @@ namespace DataLayer
 				await conn.OpenAsync();
 				await using (SQLiteCommand cmd = CreateUpdateCommand(obj, conn))
 				{
-					rowsAffected = await cmd.ExecuteNonQueryAsync();
+					try { rowsAffected = await cmd.ExecuteNonQueryAsync(); }
+					catch { return rowsAffected; }
 				}
 			}
 			return rowsAffected;
