@@ -29,6 +29,7 @@ namespace C_Projekt
 				t.Start();
 				t.Join();
 			}
+
 			base.OnStartup(e);
 		}	
 	}

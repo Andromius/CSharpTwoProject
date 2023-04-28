@@ -25,28 +25,49 @@ namespace C_Projekt
 	public partial class MainWindow : Window
 	{
 		public ObservableCollection<Reservation>? Reservations { get; set; }
+		public ObservableCollection<Service>? Services { get; set; }
 		public MainWindow()
 		{
+			FillCollections();
 			InitializeComponent();
-			DataContext = this;
-			GetReservations();
 		}
 
-		private async void GetReservations()
+		private async void FillCollections()
 		{
 			List<Reservation> reservations = await new DataMapper<Reservation>().SelectAll();
 			Reservations = new ObservableCollection<Reservation>(reservations);
+			List<Service> services = await new DataMapper<Service>().SelectAll();
+			Services = new ObservableCollection<Service>(services);
 		}
 
-		private async void DeleteButton_Click(object sender, RoutedEventArgs e)
+		private async void Delete_Click(object sender, RoutedEventArgs e)
 		{
 			Button button = (Button)sender;
-			Reservation reservation = (Reservation)button.DataContext;
-			if (await new DataMapper<Reservation>().Delete(reservation) > 0)
-			{ 
-				Reservations.Remove(reservation); 
+			if(button.DataContext is Reservation r)
+			{
+				if (await new DataMapper<Reservation>().Delete(r) > 0)
+				{
+					Reservations.Remove(r);
+				}
+			}
+			else if(button.DataContext is Service s)
+			{
+				if (await new DataMapper<Service>().Delete(s) > 0)
+				{
+					Services.Remove(s);
+				}
 			}
         }
+
+		private async void DeleteServiceButton_Click(object sender, RoutedEventArgs e)
+		{
+			Button button = (Button)sender;
+			Service service = (Service)button.DataContext;
+			if (await new DataMapper<Service>().Delete(service) > 0)
+			{
+				Services.Remove(service);
+			}
+		}
 
 		private async void Dg_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
@@ -54,7 +75,7 @@ namespace C_Projekt
 			var cells = grid.SelectedCells;
 			Reservation r = (Reservation)cells[0].Item;
 			Grid windowGrid = (Grid)Content;
-			Grid detailGrid = (Grid)windowGrid.Children[1];
+			Grid detailGrid = (Grid)windowGrid.Children[3];
 			StackPanel sp = (StackPanel)detailGrid.Children[0];
 			TextBox[] textBoxes = sp.Children.OfType<TextBox>().ToArray();
 			if (r != null)
@@ -74,39 +95,70 @@ namespace C_Projekt
 				textbox.Text = "";
 			}
 		}
-
-		private void Save_Click(object sender, RoutedEventArgs e)
-		{
-
-		}
-
-		private void Clear_Click(object sender, RoutedEventArgs e)
-		{
-			Grid windowGrid = (Grid)Content;
-			Grid detailGrid = (Grid)windowGrid.Children[1];
-			StackPanel sp = (StackPanel)detailGrid.Children[0];
-			IEnumerable<TextBox> textboxes = sp.Children.OfType<TextBox>();
-			foreach (TextBox textbox in textboxes)
-			{
-				textbox.Text = "";
-			}
-		}
-
-		public void Dg_Selected(object sender, RoutedEventArgs e)
-		{
-			DataGrid dataGrid = (DataGrid)sender;
-		}
-
 		private void Dg_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			Grid windowGrid = (Grid)Content;
-			Grid detailGrid = (Grid)windowGrid.Children[1];
+			Grid detailGrid = (Grid)windowGrid.Children[3];
 			StackPanel sp = (StackPanel)detailGrid.Children[0];
 			IEnumerable<TextBox> textboxes = sp.Children.OfType<TextBox>();
 			foreach (TextBox textbox in textboxes)
 			{
 				textbox.Text = "";
 			}
+		}
+		private void AddReservation_Click(object sender, RoutedEventArgs e)
+		{
+			ReservationForm form = new ReservationForm();
+			form.OnFormSubmit += async () => { 
+				Reservations.Clear();
+                foreach (var item in await new DataMapper<Reservation>().SelectAll())
+                {
+                    Reservations.Add(item);
+                }
+            };
+			form.Show();
+		}
+		private void AddService_Click(object sender, RoutedEventArgs e)
+		{
+			ServiceForm form = new ServiceForm();
+			form.OnFormSubmit += async () => {
+				Services.Clear();
+				foreach (var item in await new DataMapper<Service>().SelectAll())
+				{
+					Services.Add(item);
+				}
+			};
+			form.Show();
+		}
+
+		private void Edit_Click(object sender, RoutedEventArgs e)
+		{
+			Button btn = (Button)sender;
+			if(btn.DataContext is Reservation r)
+			{
+				ReservationForm form = new ReservationForm(r);
+				form.OnFormSubmit += async () => {
+					Reservations.Clear();
+					foreach (var item in await new DataMapper<Reservation>().SelectAll())
+					{
+						Reservations.Add(item);
+					}
+				};
+				form.Show();
+			}
+			else if(btn.DataContext is Service s)
+			{
+				ServiceForm form = new ServiceForm(s);
+				form.OnFormSubmit += async () => {
+					Services.Clear();
+					foreach (var item in await new DataMapper<Service>().SelectAll())
+					{
+						Services.Add(item);
+					}
+				};
+				form.Show();
+			}
+
 		}
 	}
 }

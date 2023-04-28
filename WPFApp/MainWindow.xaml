@@ -5,13 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:C_Projekt"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="HairdresserAdmin" Height="450" Width="800">
+    <Window.DataContext>
+        <Binding RelativeSource="{RelativeSource Self}"></Binding>
+    </Window.DataContext>
+    
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="4*"/>
+            <RowDefinition Height="4*"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
         <DataGrid ItemsSource="{Binding Reservations}" 
@@ -34,15 +40,46 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <Button Content="Delete" Margin="5 0 0 0" MinWidth="50" Click="DeleteButton_Click"/>
-                                <Button Content="Edit" Margin="5 0 0 0" MinWidth="50"/>
+                                <Button Content="Delete" Margin="5 0 0 0" MinWidth="50" Click="Delete_Click"/>
+                                <Button Content="Edit" Margin="5 0 0 0" MinWidth="50" Click="Edit_Click"/>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <Grid Grid.Column="1" Background="LightGray" Margin="5 0 0 0">
+        <DataGrid ItemsSource="{Binding Services}" 
+                  Grid.Row="1" 
+                  Grid.Column="0" 
+                  AutoGenerateColumns="False" 
+                  IsReadOnly="True" 
+                  ColumnWidth="auto"
+                  Width="auto"
+                  Margin="0 5 0 0">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
+                <DataGridTextColumn Header="ServiceName" Binding="{Binding Name}"/>
+                <DataGridTemplateColumn Header="Actions" Width="100*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Delete" Margin="5 0 0 0" MinWidth="50" Click="Delete_Click"/>
+                                <Button Content="Edit" Margin="5 0 0 0" MinWidth="50" Click="Edit_Click"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0" Margin="0 5 0 0" Content="Add Reservation" Click="AddReservation_Click"></Button>
+            <Button Grid.Row="1" Margin="0 5 0 0" Content="Add Service" Click="AddService_Click"></Button>
+        </Grid>
+        <Grid Grid.Column="1" Grid.RowSpan="3" Background="LightGray" Margin="5 0 0 0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition/>
@@ -52,7 +89,7 @@
                 <Label Content="Name:"/>
                 <TextBox IsReadOnly="True" Margin="5 0 5 0"/>
                 <Label Content="Surname:"/>
-                <TextBox Margin="5 0 5 0"/>
+                <TextBox Margin="5 0 5 0" IsReadOnly="True"/>
                 <Label Content="Service:"/>
                 <TextBox IsReadOnly="True" Margin="5 0 5 0"/>
                 <Label Content="Reservation start:"/>
@@ -60,15 +97,6 @@
                 <Label Content="Reservation end:"/>
                 <TextBox Margin="5 0 5 0" IsReadOnly="True"/>
             </StackPanel>
-            <Grid HorizontalAlignment="Stretch" Grid.Row="1" VerticalAlignment="Bottom" Margin="0 0 0 5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Button Content="Clear" Grid.Column="0" Margin="5 0 5 0" Click="Clear_Click"></Button>
-                <Button Content="Save" Grid.Column="1" Margin="5 0 5 0" Click="Save_Click"></Button>
-            </Grid>
         </Grid>
-        
     </Grid>
 </Window>
