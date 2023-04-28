@@ -39,5 +39,9 @@ namespace BusinessLayer
             Email = email;
             Password = new PasswordHasher().HashPassword(password);
         }
-    }
+		public override string ToString()
+		{
+            return $"{Name} {Surname}";
+		}
+	}
 }
