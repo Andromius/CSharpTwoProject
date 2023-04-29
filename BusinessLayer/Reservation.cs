@@ -3,24 +3,34 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace BusinessLayer
 {
 	[DbEntity]
+	[DataContract]
 	public class Reservation : DomainObject
 	{
 		[DbForeignKey]
+		[JsonInclude]
+		[DataMember]
 		[DbAttr("user")]
 		public User Reservee { private get; set; }
 		
 		[DbAttr("reservation_start")]
+		[DataMember]
 		public DateTime ReservationStart { get; set; }
 		[DbAttr("reservation_end")]
+		[DataMember]
 		public DateTime ReservationEnd { get; set; }
 
 		[DbForeignKey]
+		[JsonInclude]
+		[DataMember]
 		[DbAttr("service")]
 		public Service Service { private get; set; }
 
