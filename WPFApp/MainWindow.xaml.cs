@@ -1,11 +1,15 @@
 ﻿using BusinessLayer;
+using BusinessLayer.Services;
 using DataLayer;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -158,7 +162,48 @@ namespace C_Projekt
 				};
 				form.Show();
 			}
-
+		}
+		private void ExportJSON_Click(object sender, RoutedEventArgs e)
+		{
+			Thread t = new Thread(() =>
+			{
+				SaveFileDialog fileDialog = new SaveFileDialog();
+				fileDialog.Filter = "JSON files | *.json";
+				fileDialog.FileName = "reservations.json";
+				if (!fileDialog.ShowDialog().Value)
+				{
+					return;
+				}
+				Stream jsonStream = fileDialog.OpenFile();
+				if(jsonStream is null)
+				{
+					return;
+				}
+				ExportJSONService<Reservation> service = new ExportJSONService<Reservation>(jsonStream);
+				service.Export(Reservations.ToList());
+			});
+			t.Start();
+		}
+		private void ExportXML_Click(object sender, RoutedEventArgs e)
+		{
+			Thread t = new Thread(() =>
+			{
+				SaveFileDialog fileDialog = new SaveFileDialog();
+				fileDialog.Filter = "XML files | *.xml";
+				fileDialog.FileName = "reservations.xml";
+				if (!fileDialog.ShowDialog().Value)
+				{
+					return;
+				}
+				Stream xmlStream = fileDialog.OpenFile();
+				if (xmlStream is null)
+				{
+					return;
+				}
+				ExportXMLService<Reservation> service = new ExportXMLService<Reservation>(xmlStream);
+				service.Export(Reservations.ToList());
+			});
+			t.Start();
 		}
 	}
 }
