@@ -22,12 +22,7 @@ namespace C_Projekt
 
 			if (!File.Exists(System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)+"\\HairdresserDB.db"))
 			{
-				Thread t = new Thread(() =>
-				{
-					DB.CreateTables();
-				});
-				t.Start();
-				t.Join();
+				DB.CreateTables();
 			}
 
 			base.OnStartup(e);
