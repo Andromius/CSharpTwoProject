@@ -1,4 +1,6 @@
-﻿using BusinessLayer.Services.AuthServices;
+﻿using BusinessLayer;
+using BusinessLayer.Services.AuthServices;
+using BusinessLayer.Services.FormValidationService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Diagnostics;
@@ -11,9 +13,12 @@ namespace WebApp.Controllers
 	public class LoginController : Controller
 	{
 		private IAccountService _accountService;
-		public LoginController(IAccountService accountService)
+		private IFormValidationService<RegistrationForm> _formValidationService;
+
+		public LoginController(IAccountService accountService, IFormValidationService<RegistrationForm> formValidationService)
 		{
 			_accountService = accountService;
+			_formValidationService = formValidationService;
 		}
 
 		public IActionResult Index()
@@ -44,6 +49,30 @@ namespace WebApp.Controllers
 			}
 			ViewBag.Message = "Invalid credentials";
 			return View();
+		}
+
+		public IActionResult Register()
+		{
+			return View();
+		}
+		[HttpPost]
+		public async Task<IActionResult> Register(RegistrationForm form)
+		{
+			string validationMessage = _formValidationService.Validate(form);
+			if (!string.IsNullOrEmpty(validationMessage))
+			{
+				ViewBag.ValidationMessage = validationMessage.Split('\n');
+				return View();
+			}
+
+			if(!await _accountService.Register(form.Name, form.Surname, form.Email, form.Password))
+			{
+				validationMessage += "Could not register this user\n";
+				ViewBag.ValidationMessage = validationMessage.Split('\n');
+				return View();
+			}
+
+			return RedirectToAction("Index");
 		}
 	}
 }

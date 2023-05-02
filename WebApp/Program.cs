@@ -24,6 +24,7 @@ namespace WebApp
 			builder.Services.AddSingleton<IDataMappingService<Reservation>, DataMapper<Reservation>>();
 			builder.Services.AddSingleton<IDataMappingService<Service>, DataMapper<Service>>();
 			builder.Services.AddSingleton<IFormValidationService<ReservationForm>, ReservationValidationService>();
+			builder.Services.AddSingleton<IFormValidationService<RegistrationForm>, RegistrationValidationService>();
 			builder.Services.AddScoped<IReservationService, ReservationService>();
 			builder.Services.AddScoped<IAccountService, AccountService>();
 
