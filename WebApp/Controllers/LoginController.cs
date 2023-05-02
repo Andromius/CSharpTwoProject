@@ -67,7 +67,7 @@ namespace WebApp.Controllers
 
 			if(!await _accountService.Register(form.Name, form.Surname, form.Email, form.Password))
 			{
-				validationMessage += "Could not register this user\n";
+				validationMessage += "Could not register this user (user already exists/server error)\n";
 				ViewBag.ValidationMessage = validationMessage.Split('\n');
 				return View();
 			}
