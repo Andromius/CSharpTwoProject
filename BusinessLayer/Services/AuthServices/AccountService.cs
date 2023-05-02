@@ -28,5 +28,12 @@ namespace BusinessLayer.Services.AuthServices
 
 			return u;
 		}
+
+		public async Task<bool> Register(string name, string surname, string email, string password)
+		{
+			if(await _dataMapper.SelectWithCondition(new Dictionary<string, object>() { { "email", email } }) is not null)
+				return false;
+			return await _dataMapper.Insert(new User(name, surname, email, password));
+		}
 	}
 }
